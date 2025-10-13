@@ -1,7 +1,8 @@
 import pygame
 import math
 from constants import *
-
+from player import *
+from collision import wall_collision
 
 game_map = [
     "##########",
@@ -36,37 +37,25 @@ def cast_rays():
         for depth in range(1, MAX_DEPTH):
             target_x = int((player_x + cos_a * depth) / TILE_SIZE)
             target_y = int((player_y + sin_a * depth) / TILE_SIZE)
-            if game_map[target_y][target_x] == "#":
-                # Wall hit
-                depth *= math.cos(player_angle - ray_angle)
-                wall_height = 20000 / (depth + 0.0001)
-                color = 255 / (1 + depth * depth * 0.0001)
-                pygame.draw.rect(screen, (color, color, color),
-                                 (ray * (SCREEN_WIDTH // NUM_RAYS),
-                                  SCREEN_HEIGHT // 2 - wall_height // 2,
-                                  (SCREEN_WIDTH // NUM_RAYS),
-                                  wall_height))
-                break
+            # Add bounds check
+            if (0 <= target_x < MAP_WIDTH) and (0 <= target_y < MAP_HEIGHT):
+                if game_map[target_y][target_x] == "#":
+                    # Wall hit
+                    depth *= math.cos(player_angle - ray_angle)
+                    wall_height = 20000 / (depth + 0.0001)
+                    color = 255 / (1 + depth * depth * 0.0001)
+                    pygame.draw.rect(screen, (color, color, color),
+                                     (ray * (SCREEN_WIDTH // NUM_RAYS),
+                                      SCREEN_HEIGHT // 2 - wall_height // 2,
+                                      (SCREEN_WIDTH // NUM_RAYS),
+                                      wall_height))
+                    break
+            else:
+                break  # Out of bounds, stop this ray
 
-def move_player(keys, delta_time):
-    global player_x, player_y, player_angle
-    speed = 100 * delta_time
-    rot_speed = 1.5 * delta_time
-
-    if keys[pygame.K_LEFT]:
-        player_angle -= rot_speed
-    if keys[pygame.K_RIGHT]:
-        player_angle += rot_speed
-    dx = math.cos(player_angle) * speed
-    dy = math.sin(player_angle) * speed
-    if keys[pygame.K_UP]:
-        player_x += dx
-        player_y += dy
-    if keys[pygame.K_DOWN]:
-        player_x -= dx
-        player_y -= dy
 
 def game_loop():
+    global player_x, player_y, player_angle
     running = True
     while running:
         delta_time = clock.tick(60) / 1000
@@ -75,8 +64,8 @@ def game_loop():
                 running = False
 
         keys = pygame.key.get_pressed()
-        move_player(keys, delta_time)
-
+        player_angle = rotate_player(keys, player_angle, delta_time)
+        player_x, player_y = wall_collision(keys, player_x, player_y, player_angle, delta_time, game_map)
         screen.fill(DARK_GRAY)
         cast_rays()
         pygame.display.flip()
