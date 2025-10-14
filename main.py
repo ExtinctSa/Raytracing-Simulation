@@ -30,14 +30,21 @@ player_x = 100
 player_y = 100
 player_angle = 0
 light_radius = 150
+light_falloff = (light_radius / 2) ** 2
 
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 
 wall_texture = pygame.image.load("assets/textures/wall.png").convert()
-texture_size = wall_texture.get_width()  # Assuming it's square (e.g., 64x64)
+texture_size = wall_texture.get_width()
 
+# Unfortuantely I cannot move this function to another file
+# without causing heaps of issues at least
+# so all scene rendering lives here
+# as much as it hurts me to not categorize
+# moving it to a render.py file causes player movement to break, idk why
+# spaghetti code :)
 def cast_rays():
     start_angle = player_angle - FOV / 2
     ray_angle_step = FOV / NUM_RAYS
@@ -105,7 +112,8 @@ def cast_rays():
         texture_column = wall_texture.subsurface((texture_x, 0, 1, texture_size))
 
         if corrected_depth <= light_radius:
-            brightness = 1 - (corrected_depth / light_radius)
+            global light_falloff
+            brightness = 1 / (1 + (corrected_depth ** 2) / light_falloff)
             brightness = clamp(brightness, 0.0, 1.0)
         else:
             brightness = 0.1
@@ -124,7 +132,6 @@ def cast_rays():
             scaled_column,
             (ray * (SCREEN_WIDTH // NUM_RAYS), SCREEN_HEIGHT // 2 - wall_height // 2)
         )
-
 
 
 def game_loop():
