@@ -1,4 +1,5 @@
 Hello!
+THERE IS A KNOWN BUG WHERE PART OF THE RIGHT SIDE OF THE FOV DOESN'T RENDER, I'M TRYING TO FIX IT
 This is my attempt to create a psuedo 3D environment in Pygame.
 I want this project to be so much more than it currently is, as of right now it's a room with just walls.
 I will probably come back to this in my free time to actually make a game, but for right now it's enough.
