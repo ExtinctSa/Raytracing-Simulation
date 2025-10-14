@@ -1,1 +1,4 @@
 /pygame
+.venv
+.ds_Store
+__pycache__
