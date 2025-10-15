@@ -138,8 +138,7 @@ Vertically centers it (SCREEN_HEIGHT // 2 - wall_height // 2).
 Collision works as such:
 It takes 6 parameters:
 1. The keys pressed: "keys"
-    This is done very similarly to how we did it in the Asteroids project with 1 key difference
-    The left and right arrow keys affect the player's rotation angle instead of movement
+    This is done very similarly to how we did it in the Asteroids project.
 
 2 and 3. The player's current x and y positions respectively: "player_x, player_y"
 
